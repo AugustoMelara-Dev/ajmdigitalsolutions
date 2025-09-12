@@ -1,0 +1,150 @@
+/* --- FILE: src/app/globals.css (PRO, limpio y AA) --- */
+/* Tailwind v4 */
+@import "tailwindcss";
+
+/* =========================
+   TOKENS (dark por defecto)
+   ========================= */
+/* Contraste verificado (AA/AAA):
+   #EAF2FF sobre #0A1525 ≈ 16.26:1
+   #9FB4C8  sobre #0A1525 ≈  8.58:1
+   rgba(234,242,255,.70) sobre #0A1525 ≈ 8.34:1
+*/
+:root {
+  /* Marca (dark) */
+  --ajm-bg: #0A1525;                 /* fondo */
+  --ajm-white: #EAF2FF;              /* texto principal */
+  --ajm-ink: #9FB4C8;                /* texto secundario (AA sobre #0A1525) */
+  --ajm-muted: rgba(234,242,255,.70);/* texto sutil */
+  --ajm-accent: #3A97D4;             /* acento único y consistente */
+  --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+
+  /* Dimensiones */
+  --nav-h: 72px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+
+  color-scheme: dark;
+}
+
+/* Tema claro opcional (si algún día lo usas con <html class="light">) */
+html.light {
+  --ajm-bg: #ffffff;
+  --ajm-white: #0F172A;
+  --ajm-ink: #334155;      /* slate-700 */
+  --ajm-muted: #64748B;    /* slate-500 */
+  --ajm-accent: #1E40AF;   /* brand para claro */
+  --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+  color-scheme: light;
+}
+
+/* =========================
+   BASE
+   ========================= */
+@layer base {
+  html, body { height: 100%; }
+
+  body {
+    background: var(--ajm-bg);
+    color: var(--ajm-white);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tipos (evita clipping de descendentes) */
+  h1, h2, h3 { line-height: 1.15; }
+
+  /* Selección y foco AA */
+  ::selection { background: color-mix(in srgb, var(--ajm-accent) 25%, transparent); }
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ajm-accent) 70%, white 0%);
+    outline-offset: 3px;
+  }
+
+  /* Medios */
+  img, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+
+  /* Enlaces */
+  a { text-underline-offset: 2px; text-decoration-thickness: 0.08em; }
+  a:hover { text-decoration-thickness: 0.1em; }
+}
+
+/* =========================
+   MOTION + ANCLAS
+   ========================= */
+html { 
+  scroll-behavior: smooth; 
+  scroll-padding-top: var(--nav-h);
+}
+
+[id] { scroll-margin-top: var(--nav-h); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* =========================
+   UTILITIES
+   ========================= */
+@layer utilities {
+  .container-tight { @apply mx-auto max-w-7xl px-4 md:px-6; }
+  .section-y      { @apply py-12 md:py-16 lg:py-20; }
+
+  /* ❗Ya no pisamos las de Tailwind. Aliases propios: */
+  .rounded-ajm-xl  { border-radius: var(--radius-xl); }
+  .rounded-ajm-2xl { border-radius: var(--radius-2xl); }
+
+  .shadow-card    { box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 20px rgba(0,0,0,.08); }
+
+  /* Nuevas utilidades */
+  .bg-ajm-grad   { background: var(--ajm-grad); }
+  .text-balance  { text-wrap: balance; }
+}
+
+/* =========================
+   COMPONENTS (Navbar/Hero/Cards)
+   ========================= */
+@layer components {
+  /* Glass navbar */
+  .glass-ajm {
+    @apply border border-white/10 rounded-2xl backdrop-blur-xl;
+    background: linear-gradient(180deg, rgba(18,27,45,.68), rgba(18,27,45,.52));
+  }
+
+  /* CTA navbar (texto oscuro sobre fondo claro = AA) */
+  .btn-primary-ajm {
+    @apply inline-flex items-center gap-2 rounded-md px-3 py-2 font-semibold transition;
+    background: var(--ajm-white);
+    color: #0A1525;
+  }
+  .btn-primary-ajm:hover { opacity: .92; }
+
+  /* Helpers de color coherentes con tokens */
+  .text-ajm-white { color: var(--ajm-white); }
+  .text-ajm-ink   { color: var(--ajm-ink); }
+  .text-ajm-muted { color: var(--ajm-muted); }
+
+  .bg-ajm-bg      { background-color: var(--ajm-bg); }
+  .bg-ajm-accent  { background-color: var(--ajm-accent); }
+
+  /* Ring de acento accesible */
+  .ring-ajm-accent { --tw-ring-color: color-mix(in srgb, var(--ajm-accent) 85%, white 0%); }
+
+  /* Superficie de tarjeta consistente */
+  .card-ajm {
+    @apply border border-white/10 backdrop-blur-sm;
+    background: color-mix(in srgb, #ffffff 6%, transparent);
+  }
+}
+/* Quita el outline solo en los focos programáticos que hacemos con tabindex="-1" */
+@layer base {
+  [tabindex="-1"]:focus,
+  [tabindex="-1"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important; /* neutraliza focus:ring de Tailwind si lo hubiera */
+  }
+}
