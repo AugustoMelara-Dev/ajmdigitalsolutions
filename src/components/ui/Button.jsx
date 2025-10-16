@@ -34,7 +34,7 @@ const variants = {
   /** Neutro dentro de cards/listas */
   outline:
     "bg-transparent border border-slate-300 text-slate-900 hover:bg-slate-50 " +
-    "dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800/50",
+    "dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800/50",
   /** Acción de muy bajo peso visual */
   ghost:
     "bg-transparent text-brand hover:bg-brand/10 active:bg-brand/15 " +
