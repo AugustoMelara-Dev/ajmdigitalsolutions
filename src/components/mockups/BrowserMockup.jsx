@@ -1,4 +1,4 @@
-/* --- FILE: src/components/mockups/BrowserMockup.jsx --- */
+/* --- FILE: src/components/mockups/BrowserMockup.jsx (CORREGIDO) --- */
 "use client";
 
 import Image from "next/image";
@@ -17,7 +17,7 @@ function BrowserMockup({
   alt = "Vista previa de un proyecto web en navegador",
   href = "https://cliente-ejemplo.com",
   ratio = "16/10",
-  priority = false,
+  priority = true, // <-- CORRECCIÓN: Cambiado a 'true' por defecto
   className = "",
 }) {
   return (

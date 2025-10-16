@@ -312,7 +312,7 @@ export default function ContactForm() {
               className={cn(
                 "w-full rounded-xl border bg-white/8 px-4 py-3 text-ajm-white placeholder:text-ajm-muted backdrop-blur-sm",
                 "focus:outline-none focus:ring-2 focus:ring-[var(--ajm-accent)]",
-                errors.nombre ? "border-red-400/40" : "border-white/10"
+                errors.nombre ? "border-red-400/40" : "border-white/20"
               )}
               placeholder="Tu nombre"
               aria-invalid={!!errors.nombre}
