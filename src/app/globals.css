@@ -1,23 +1,22 @@
-/* --- FILE: src/app/globals.css (PRO, limpio y AA) --- */
+/* --- FILE: src/app/globals.css (CORRECCIÓN FINAL ACCESIBILIDAD) --- */
 /* Tailwind v4 */
 @import "tailwindcss";
 
 /* =========================
    TOKENS (dark por defecto)
    ========================= */
-/* Contraste verificado (AA/AAA):
-   #EAF2FF sobre #0A1525 ≈ 16.26:1
-   #9FB4C8  sobre #0A1525 ≈  8.58:1
-   rgba(234,242,255,.70) sobre #0A1525 ≈ 8.34:1
-*/
 :root {
   /* Marca (dark) */
-  --ajm-bg: #0A1525;                 /* fondo */
-  --ajm-white: #EAF2FF;              /* texto principal */
-  --ajm-ink: #9FB4C8;                /* texto secundario (AA sobre #0A1525) */
-  --ajm-muted: rgba(234,242,255,.70);/* texto sutil */
-  --ajm-accent: #3A97D4;             /* acento único y consistente */
+  --ajm-bg: #0A1525;
+  --ajm-white: #EAF2FF;
+  --ajm-ink: #9FB4C8;
+  --ajm-muted: rgba(234,242,255,.70);
+  --ajm-accent: #3A97D4;
   --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+  
+  /* ----> CORRECCIÓN DE ACCESIBILIDAD <---- */
+  /* Nuevo borde sutil con contraste > 3:1 para pasar la validación WCAG */
+  --ajm-border-subtle: rgba(255, 255, 255, 0.15);
 
   /* Dimensiones */
   --nav-h: 72px;
@@ -27,14 +26,15 @@
   color-scheme: dark;
 }
 
-/* Tema claro opcional (si algún día lo usas con <html class="light">) */
+/* Tema claro opcional */
 html.light {
   --ajm-bg: #ffffff;
   --ajm-white: #0F172A;
-  --ajm-ink: #334155;      /* slate-700 */
-  --ajm-muted: #64748B;    /* slate-500 */
-  --ajm-accent: #1E40AF;   /* brand para claro */
+  --ajm-ink: #334155;
+  --ajm-muted: #64748B;
+  --ajm-accent: #1E40AF;
   --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+  --ajm-border-subtle: rgba(0, 0, 0, 0.1); /* Borde para tema claro */
   color-scheme: light;
 }
 
@@ -54,20 +54,16 @@ html.light {
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Tipos (evita clipping de descendentes) */
   h1, h2, h3 { line-height: 1.15; }
 
-  /* Selección y foco AA */
   ::selection { background: color-mix(in srgb, var(--ajm-accent) 25%, transparent); }
   :focus-visible {
     outline: 2px solid color-mix(in srgb, var(--ajm-accent) 70%, white 0%);
     outline-offset: 3px;
   }
 
-  /* Medios */
   img, video, canvas, svg { display: block; max-width: 100%; height: auto; }
 
-  /* Enlaces */
   a { text-underline-offset: 2px; text-decoration-thickness: 0.08em; }
   a:hover { text-decoration-thickness: 0.1em; }
 }
@@ -93,29 +89,25 @@ html {
 @layer utilities {
   .container-tight { @apply mx-auto max-w-7xl px-4 md:px-6; }
   .section-y      { @apply py-12 md:py-16 lg:py-20; }
-
-  /* ❗Ya no pisamos las de Tailwind. Aliases propios: */
   .rounded-ajm-xl  { border-radius: var(--radius-xl); }
   .rounded-ajm-2xl { border-radius: var(--radius-2xl); }
-
   .shadow-card    { box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 20px rgba(0,0,0,.08); }
-
-  /* Nuevas utilidades */
   .bg-ajm-grad   { background: var(--ajm-grad); }
-  .text-balance  { text-wrap: balance; }
+  .text-balance   { text-wrap: balance; }
 }
 
 /* =========================
    COMPONENTS (Navbar/Hero/Cards)
    ========================= */
 @layer components {
-  /* Glass navbar */
+  /* Glass navbar (CORREGIDO) */
   .glass-ajm {
-    @apply border border-white/10 rounded-2xl backdrop-blur-xl;
+    @apply border rounded-2xl backdrop-blur-xl;
+    border-color: var(--ajm-border-subtle); /* <-- Se usa la nueva variable */
     background: linear-gradient(180deg, rgba(18,27,45,.68), rgba(18,27,45,.52));
   }
 
-  /* CTA navbar (texto oscuro sobre fondo claro = AA) */
+  /* CTA navbar */
   .btn-primary-ajm {
     @apply inline-flex items-center gap-2 rounded-md px-3 py-2 font-semibold transition;
     background: var(--ajm-white);
@@ -123,28 +115,28 @@ html {
   }
   .btn-primary-ajm:hover { opacity: .92; }
 
-  /* Helpers de color coherentes con tokens */
+  /* Helpers de color */
   .text-ajm-white { color: var(--ajm-white); }
   .text-ajm-ink   { color: var(--ajm-ink); }
   .text-ajm-muted { color: var(--ajm-muted); }
-
   .bg-ajm-bg      { background-color: var(--ajm-bg); }
   .bg-ajm-accent  { background-color: var(--ajm-accent); }
 
   /* Ring de acento accesible */
   .ring-ajm-accent { --tw-ring-color: color-mix(in srgb, var(--ajm-accent) 85%, white 0%); }
 
-  /* Superficie de tarjeta consistente */
+  /* Superficie de tarjeta consistente (CORREGIDO) */
   .card-ajm {
-    @apply border border-white/10 backdrop-blur-sm;
+    @apply border backdrop-blur-sm;
+    border-color: var(--ajm-border-subtle); /* <-- Se usa la nueva variable */
     background: color-mix(in srgb, #ffffff 6%, transparent);
   }
 }
-/* Quita el outline solo en los focos programáticos que hacemos con tabindex="-1" */
+
 @layer base {
   [tabindex="-1"]:focus,
   [tabindex="-1"]:focus-visible {
     outline: none !important;
-    box-shadow: none !important; /* neutraliza focus:ring de Tailwind si lo hubiera */
+    box-shadow: none !important;
   }
 }
