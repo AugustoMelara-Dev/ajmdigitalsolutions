@@ -28,7 +28,7 @@ const NAV = [
   { label: "Planes", href: "/#planes" },
   { label: "Portafolio", href: "/#portafolio" },
   { label: "Proceso", href: "/#proceso" },
-  { label: "Sobre mí", href: "/sobre-mi" },
+  //{ label: "Sobre mí", href: "/sobre-mi" },
 ];
 
 const SOPORTE_LEGAL = [
