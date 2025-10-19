@@ -195,7 +195,7 @@ export default function WhyUsSection() {
             </Button>
 
             <Button
-              href="#servicios"
+              href="/servicios"
               variant="outline"
               className="text-ajm-white"
               trailingIcon={ArrowRight}
