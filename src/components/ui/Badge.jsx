@@ -1,29 +1,45 @@
-/* --- FILE: src/components/ui/Badge.jsx (CORREGIDO) --- */
-/**
- * @file Badge.jsx
- * @description Badge reutilizable, adaptado al tema "El Jardín de la Abuela".
- * @description Usa variables CSS del tema y se eliminó el modo oscuro.
- */
+/* --- FILE: src/components/ui/Badge.jsx --- */
+// Debe ser Client Component (se usa en interacciones/animaciones)
 'use client';
 
-import React, { forwardRef, memo } from 'react'; // <-- ¡CORREGIDO!
+import React, { forwardRef, memo } from 'react';
 import { Sparkles as SparklesIcon } from 'lucide-react';
-// Asumiendo que cn existe en utils
-import { cn } from '@/lib/utils';
 
-// --- PALETA DE TONOS ADAPTADA AL TEMA ---
+/**
+ * Badge sobrio y reutilizable (production-ready).
+ * - Dark mode con contraste AA.
+ * - Tamaños: sm | md.
+ * - Tonos: neutral | brand | sky | cyan | amber | rose | emerald.
+ *   *Nota*: "brand" requiere color definido en Tailwind (theme.extend.colors.brand).
+ * - Icono opcional (por defecto Sparkles) o "dot" de estado.
+ * - Estados: selected, disabled (a nivel button y pseudo en anchor).
+ * - Polimórfico: as="span" | "a" | "button".
+ * - Accesibilidad: focus visible, aria-pressed en button toggle, aria-disabled en anchor/span.
+ */
+
 const TONES = {
-  // Tono secundario/neutral (usa colores de fondo y borde del tema)
-  secondary:
-    'border-[--color-border] text-[--color-foreground-muted] bg-[--color-background-alt]',
-  // Tono principal (usa el color primario del tema, ej. Lavender Pink)
-  primary:
-    'border-[--color-primary-border] text-[--color-primary] bg-[--color-primary-bg]/20',
-  // Tono destructivo (usa variables semánticas)
-  destructive:
-    'border-transparent text-[--color-destructive-fg] bg-[--color-destructive]',
+  neutral:
+    'border-slate-200 text-slate-700 bg-slate-50 ' +
+    'dark:border-slate-700 dark:text-slate-200 dark:bg-slate-800/60',
+  brand:
+    'border-brand/30 text-brand bg-brand/5 ' +
+    'dark:border-brand/30 dark:text-brand dark:bg-brand/10',
+  sky:
+    'border-sky-300/60 text-sky-800 bg-sky-50 ' +
+    'dark:border-sky-700/60 dark:text-sky-300 dark:bg-sky-900/20',
+  cyan:
+    'border-cyan-300/60 text-cyan-800 bg-cyan-50 ' +
+    'dark:border-cyan-700/60 dark:text-cyan-300 dark:bg-cyan-900/20',
+  amber:
+    'border-amber-300/60 text-amber-800 bg-amber-50 ' +
+    'dark:border-amber-700/60 dark:text-amber-300 dark:bg-amber-900/20',
+  rose:
+    'border-rose-300/60 text-rose-800 bg-rose-50 ' +
+    'dark:border-rose-700/60 dark:text-rose-300 dark:bg-rose-900/20',
+  emerald:
+    'border-emerald-300/60 text-emerald-800 bg-emerald-50 ' +
+    'dark:border-emerald-700/60 dark:text-emerald-300 dark:bg-emerald-900/20',
 };
-// --- FIN ADAPTACIÓN ---
 
 const SIZES = {
   sm: 'px-2.5 py-1 text-[11px]',
@@ -35,15 +51,18 @@ const base =
   'whitespace-nowrap align-middle select-none transition-colors';
 
 const interactive =
-  // --- ADAPTADO: Anillo de foco del tema ---
-  'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)] ' +
+  // Nota: focus ring usa currentColor para no depender de "brand" en el theme
+  'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/35 ' +
   'hover:shadow-sm motion-safe:hover:translate-y-0.5 motion-safe:active:translate-y-0 ' +
   'motion-reduce:transition-none motion-reduce:transform-none';
 
-// --- ADAPTADO: Anillo de selección usa color primario ---
-const selectedCls = 'ring-1 ring-[--color-primary]';
+const selectedCls = 'ring-1 ring-current/20';
 
-// Polimórfico con fallback seguro
+// Polimórfico con fallback seguro:
+// - href  => 'a'
+// - as    => respeta lo que llega
+// - onClick sin href => 'button'
+// - default => 'span'
 function getTag(asProp, href, hasOnClick) {
   if (href) return 'a';
   if (asProp) return asProp;
@@ -55,7 +74,7 @@ const Badge = memo(
   forwardRef(function Badge(
     {
       children,
-      tone = 'secondary', // --- ADAPTADO: Default a 'secondary'
+      tone = 'neutral',
       size = 'sm',
       icon: Icon = SparklesIcon,
       iconPosition = 'left', // 'left' | 'right'
@@ -65,20 +84,21 @@ const Badge = memo(
       selected = false, // chips/filters
       dot = false, // punto de estado en vez de icono
       dotLabel, // etiqueta accesible opcional para el dot
-      disabled = false,
+      disabled = false, // para button; en anchor se emula con aria-disabled + pointer-events-none
       className = '',
       ...rest
     },
     ref
   ) {
     const Tag = getTag(as, href, typeof rest.onClick === 'function');
-    const palette = TONES[tone] ?? TONES.secondary;
+    const palette = TONES[tone] ?? TONES.neutral;
     const sizing = SIZES[size] ?? SIZES.sm;
 
     const isLink = Tag === 'a';
     const isButton = Tag === 'button';
     const isInteractive = isLink || isButton;
 
+    // Anchor "deshabilitado": sin href, aria-disabled, sin pointer events.
     const linkDisabled = isLink && disabled;
     const safeHref = isLink && !linkDisabled ? href : undefined;
     const relProps =
@@ -108,7 +128,7 @@ const Badge = memo(
       </>
     ) : null;
 
-    const classes = cn(
+    const classes = [
       base,
       palette,
       sizing,
@@ -116,9 +136,11 @@ const Badge = memo(
       selected ? selectedCls : '',
       disabled ? 'opacity-50' : '',
       linkDisabled ? 'pointer-events-none' : '',
-      isButton && disabled ? 'cursor-not-allowed' : ''
-      // className se pasa desde cn()
-    );
+      isButton && disabled ? 'cursor-not-allowed' : '',
+      className,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     // Props ARIA y nativos
     const ariaInteractive = isButton
@@ -133,7 +155,7 @@ const Badge = memo(
         data-selected={selected ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
         href={safeHref}
-        className={cn(classes, className)} // cn aplicado aquí
+        className={classes}
         {...relProps}
         {...ariaInteractive}
         {...rest}
@@ -148,4 +170,3 @@ const Badge = memo(
 
 export { Badge };
 export default Badge;
-// --- END FILE ---

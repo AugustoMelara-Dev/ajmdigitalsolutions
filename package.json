@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.11.3",
-    "clsx": "^2.1.1",
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
     "framer-motion": "^12.23.12",
@@ -24,12 +23,11 @@
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.3.1",
     "zod": "^4.1.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4.1.15",
+    "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^20.19.13",
     "@types/react": "^19",
@@ -38,7 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.15",
+    "tailwindcss": "^4.1.12",
     "typescript": "^5"
   }
 }

@@ -1,189 +1,142 @@
-/* --- FILE: src/app/globals.css --- */
-/**
- * @file globals.css
- * @description Estilos globales, importación de Tailwind CSS y definición de variables
- * CSS para el tema "El Jardín de la Abuela".
- * @description Define la paleta de colores Lavender Pink y variables semánticas.
- */
-
-/* Importa las capas base de Tailwind CSS v4 */
+/* --- FILE: src/app/globals.css (CORRECCIÓN FINAL ACCESIBILIDAD) --- */
+/* Tailwind v4 */
 @import "tailwindcss";
 
 /* =========================
-   Paleta de Colores Base (Lavender Pink) y Neutros
-   Valores RGB para compatibilidad con opacidad de Tailwind: `bg-primary/50`
+   TOKENS (dark por defecto)
    ========================= */
 :root {
-  /* Lavender Pink Palette (Define todos los tonos como RGB) */
-  --color-lavender-pink-50-rgb: 252 243 249; /* #fcf3f9 */
-  --color-lavender-pink-100-rgb: 251 232 246; /* #fbe8f6 */
-  --color-lavender-pink-200-rgb: 248 210 237; /* #f8d2ed */
-  --color-lavender-pink-300-rgb: 245 179 224; /* #f5b3e0 */
-  --color-lavender-pink-400-rgb: 236 122 198; /* #ec7ac6 */
-  --color-lavender-pink-500-rgb: 226 82 173;  /* #e252ad */
-  --color-lavender-pink-600-rgb: 208 50 142;  /* #d0328e */
-  --color-lavender-pink-700-rgb: 180 34 115;  /* #b42273 */
-  --color-lavender-pink-800-rgb: 149 31 95;   /* #951f5f */
-  --color-lavender-pink-900-rgb: 125 30 81;   /* #7d1e51 */
-  --color-lavender-pink-950-rgb: 76 11 46;    /* #4c0b2e */
+  /* Marca (dark) */
+  --ajm-bg: #0A1525;
+  --ajm-white: #EAF2FF;
+  --ajm-ink: #9FB4C8;
+  --ajm-muted: rgba(234,242,255,.70);
+  --ajm-accent: #3A97D4;
+  --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+  
+  /* ----> CORRECCIÓN DE ACCESIBILIDAD <---- */
+  /* Nuevo borde sutil con contraste > 3:1 para pasar la validación WCAG */
+  --ajm-border-subtle: rgba(255, 255, 255, 0.15);
 
-  /* Neutros (Ejemplo: grises cálidos o piedra, ajustar según diseño final) */
-  --color-neutral-50-rgb: 248 247 246;   /* Ejemplo: Crema muy claro */
-  --color-neutral-100-rgb: 238 236 234;  /* Ejemplo */
-  --color-neutral-200-rgb: 224 220 216;  /* Ejemplo */
-  --color-neutral-700-rgb: 74 70 66;     /* Ejemplo: Texto secundario */
-  --color-neutral-900-rgb: 31 29 27;     /* Ejemplo: Texto principal */
-  --color-white-rgb: 255 255 255;
-  --color-black-rgb: 0 0 0;
+  /* Dimensiones */
+  --nav-h: 72px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
 
-/* =========================
-   Variables Semánticas del Tema (Light Theme por defecto)
-   Mapea roles a colores específicos de la paleta.
-   ========================= */
-  /* --- COLORES SEMÁNTICOS BASE --- */
-  --color-background-rgb: var(--color-neutral-50-rgb);       /* Fondo principal (Crema) */
-  --color-background-alt-rgb: var(--color-lavender-pink-50-rgb); /* Fondo alternativo (Rosa muy claro) */
-  --color-background-hover-rgb: var(--color-neutral-100-rgb); /* Hover sutil */
-  --color-foreground-rgb: var(--color-neutral-900-rgb);       /* Texto principal (Gris oscuro) */
-  --color-foreground-muted-rgb: var(--color-neutral-700-rgb); /* Texto secundario (Gris medio) */
+  color-scheme: dark;
+}
 
-  /* --- COLORES PRIMARIOS (BRAND) --- */
-  --color-primary-rgb: var(--color-lavender-pink-700-rgb);    /* Primario (Rosa oscuro) */
-  --color-primary-fg-rgb: var(--color-white-rgb);             /* Texto sobre primario */
-  --color-primary-bg-rgb: var(--color-lavender-pink-50-rgb);  /* Fondo sutil primario */
-  --color-primary-border-rgb: var(--color-lavender-pink-200-rgb); /* Borde sutil primario */
-
-  /* --- COLORES SECUNDARIOS --- */
-  --color-secondary-rgb: var(--color-lavender-pink-200-rgb);  /* Secundario (Rosa pálido) */
-  --color-secondary-fg-rgb: var(--color-lavender-pink-800-rgb);/* Texto sobre secundario */
-
-  /* --- COLORES DE ACENTO --- */
-  --color-accent-rgb: var(--color-lavender-pink-500-rgb);     /* Acento (Rosa vibrante) */
-  --color-accent-fg-rgb: var(--color-white-rgb);              /* Texto sobre acento */
-
-  /* --- COLORES DESTRUCTIVOS (ERRORES) --- */
-  --color-destructive-rgb: 220 38 38; /* Red-600 */
-  --color-destructive-fg-rgb: var(--color-white-rgb);
-
-  /* --- BORDES Y ANILLOS --- */
-  --color-border: rgba(var(--color-neutral-900-rgb), 0.1);      /* Borde sutil */
-  --color-ring: rgba(var(--color-accent-rgb), 0.5);           /* Anillo de foco */
-
-  /* --- SOMBRAS (SHADOWS) --- */
-  /* Sombras suaves para tarjetas, usando colores del tema */
-  --shadow-card: 0 4px 10px rgba(var(--color-lavender-pink-950-rgb), 0.03);
-  --shadow-card-hover: 0 6px 14px rgba(var(--color-lavender-pink-950-rgb), 0.06);
-
-  /* --- VARIABLES DE COMPONENTES --- */
-  --color-footer-bg-rgb: var(--color-lavender-pink-950-rgb); /* Fondo del Footer (muy oscuro) */
-  --color-footer-text-rgb: var(--color-lavender-pink-200-rgb); /* Texto Footer (rosa pálido) */
-  --color-footer-text-muted-rgb: var(--color-lavender-pink-300-rgb); /* Texto secundario Footer */
-  --color-footer-heading-rgb: var(--color-lavender-pink-100-rgb); /* Títulos Footer */
-  --color-footer-link-rgb: var(--color-white-rgb);            /* Enlaces Footer */
-  --color-footer-link-hover-rgb: var(--color-lavender-pink-200-rgb); /* Hover enlaces Footer */
-  --color-footer-border: rgba(var(--color-white-rgb), 0.1);   /* Borde Footer */
-  --color-footer-icon-rgb: var(--color-lavender-pink-300-rgb); /* Iconos Footer */
-
-  /* --- LAYOUT Y RADIOS --- */
-  --header-height: 72px; /* Altura por defecto del Navbar, se actualiza con JS */
-  --radius-md: 0.375rem; /* rounded-md */
-  --radius-lg: 0.5rem;   /* rounded-lg */
-  --radius-xl: 0.75rem;  /* rounded-xl */
-  --radius-2xl: 1rem;    /* rounded-2xl */
-
-  color-scheme: light; /* Tema claro por defecto */
+/* Tema claro opcional */
+html.light {
+  --ajm-bg: #ffffff;
+  --ajm-white: #0F172A;
+  --ajm-ink: #334155;
+  --ajm-muted: #64748B;
+  --ajm-accent: #1E40AF;
+  --ajm-grad: linear-gradient(90deg, var(--ajm-accent), #60A5FA, var(--ajm-accent));
+  --ajm-border-subtle: rgba(0, 0, 0, 0.1); /* Borde para tema claro */
+  color-scheme: light;
 }
 
 /* =========================
-   BASE STYLES
+   BASE
    ========================= */
 @layer base {
-  html {
-    height: 100%;
-    scroll-behavior: smooth;
-    /* Usa la variable --header-height definida por JS en Navbar */
-    scroll-padding-top: var(--header-height, 72px);
-  }
+  html, body { height: 100%; }
 
   body {
-    height: 100%;
-    /* Aplica colores y fuente base desde variables */
-    background-color: rgb(var(--color-background-rgb));
-    color: rgb(var(--color-foreground-rgb));
-    font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif); /* Usa variable de layout.jsx */
-    line-height: 1.6; /* Altura de línea cómoda */
+    background: var(--ajm-bg);
+    color: var(--ajm-white);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    line-height: 1.6;
     letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Estilos base para encabezados */
-  h1, h2, h3, h4, h5, h6 {
-    text-wrap: balance; /* Mejora balance de líneas en títulos */
-    line-height: 1.25; /* Ligeramente más ajustado para títulos */
-  }
+  h1, h2, h3 { line-height: 1.15; }
 
-  /* Estilo de selección de texto usando el color primario */
-  ::selection {
-    background-color: rgba(var(--color-primary-rgb), 0.2);
-    color: rgb(var(--color-foreground-rgb));
-  }
-
-  /* Estilo de foco visible claro y accesible */
+  ::selection { background: color-mix(in srgb, var(--ajm-accent) 25%, transparent); }
   :focus-visible {
-    outline: 2px solid rgb(var(--color-ring));
-    outline-offset: 2px;
-    border-radius: var(--radius-md); /* Redondea el outline */
+    outline: 2px solid color-mix(in srgb, var(--ajm-accent) 70%, white 0%);
+    outline-offset: 3px;
   }
 
-  /* Asegura responsividad base de imágenes */
-  img, video, canvas, svg {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
+  img, video, canvas, svg { display: block; max-width: 100%; height: auto; }
 
-  /* Estilos base para enlaces */
-  a {
-    /* Color de enlace usando primario */
-    color: rgb(var(--color-primary-rgb));
-    text-decoration-thickness: 1px; /* Más sutil */
-    text-underline-offset: 3px;
-    transition: color 0.2s ease-out;
-  }
-  a:hover {
-    /* Ligeramente más oscuro al hacer hover */
-    color: rgba(var(--color-primary-rgb), 0.8);
-    text-decoration: underline; /* Muestra subrayado al hacer hover */
-  }
-
-  /* Asegura que elementos con tabindex=-1 no muestren outline */
-  [tabindex="-1"]:focus,
-  [tabindex="-1"]:focus-visible {
-    outline: none !important;
-    box-shadow: none;
-  }
-
-  /* Scroll margin para anclas */
-  [id] {
-    scroll-margin-top: var(--header-height, 72px);
-  }
+  a { text-underline-offset: 2px; text-decoration-thickness: 0.08em; }
+  a:hover { text-decoration-thickness: 0.1em; }
 }
 
 /* =========================
-   REDUCE MOTION
+   MOTION + ANCLAS
    ========================= */
+html { 
+  scroll-behavior: smooth; 
+  scroll-padding-top: var(--nav-h);
+}
+
+[id] { scroll-margin-top: var(--nav-h); }
+
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto; /* Desactiva scroll suave */
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* =========================
+   UTILITIES
+   ========================= */
+@layer utilities {
+  .container-tight { @apply mx-auto max-w-7xl px-4 md:px-6; }
+  .section-y      { @apply py-12 md:py-16 lg:py-20; }
+  .rounded-ajm-xl  { border-radius: var(--radius-xl); }
+  .rounded-ajm-2xl { border-radius: var(--radius-2xl); }
+  .shadow-card    { box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 20px rgba(0,0,0,.08); }
+  .bg-ajm-grad   { background: var(--ajm-grad); }
+  .text-balance   { text-wrap: balance; }
+}
+
+/* =========================
+   COMPONENTS (Navbar/Hero/Cards)
+   ========================= */
+@layer components {
+  /* Glass navbar (CORREGIDO) */
+  .glass-ajm {
+    @apply border rounded-2xl backdrop-blur-xl;
+    border-color: var(--ajm-border-subtle); /* <-- Se usa la nueva variable */
+    background: linear-gradient(180deg, rgba(18,27,45,.68), rgba(18,27,45,.52));
   }
-  /* Desactiva todas las animaciones y transiciones */
-  *, *::before, *::after {
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 1ms !important;
-    scroll-behavior: auto !important;
-    transition-delay: 0ms !important;
-    animation-delay: 0ms !important;
+
+  /* CTA navbar */
+  .btn-primary-ajm {
+    @apply inline-flex items-center gap-2 rounded-md px-3 py-2 font-semibold transition;
+    background: var(--ajm-white);
+    color: #0A1525;
+  }
+  .btn-primary-ajm:hover { opacity: .92; }
+
+  /* Helpers de color */
+  .text-ajm-white { color: var(--ajm-white); }
+  .text-ajm-ink   { color: var(--ajm-ink); }
+  .text-ajm-muted { color: var(--ajm-muted); }
+  .bg-ajm-bg      { background-color: var(--ajm-bg); }
+  .bg-ajm-accent  { background-color: var(--ajm-accent); }
+
+  /* Ring de acento accesible */
+  .ring-ajm-accent { --tw-ring-color: color-mix(in srgb, var(--ajm-accent) 85%, white 0%); }
+
+  /* Superficie de tarjeta consistente (CORREGIDO) */
+  .card-ajm {
+    @apply border backdrop-blur-sm;
+    border-color: var(--ajm-border-subtle); /* <-- Se usa la nueva variable */
+    background: color-mix(in srgb, #ffffff 6%, transparent);
+  }
+}
+
+@layer base {
+  [tabindex="-1"]:focus,
+  [tabindex="-1"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
   }
 }

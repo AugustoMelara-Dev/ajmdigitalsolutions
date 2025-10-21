@@ -1,19 +1,17 @@
-/* --- FILE: src/components/ui/Section.jsx (v2 - ARREGLADO Y TEMATIZADO) --- */
+/* --- FILE: src/components/ui/Section.jsx --- */
 'use client';
 
 import React, { forwardRef, memo, useEffect, useId, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useFadeUp } from '@/hooks/useFadeUp';
-// Asumiendo que cn existe en utils
-import { cn } from '@/lib/utils';
 
 /* =========================
    Helpers robustos
    ========================= */
 function normalizeAs(As) {
+  // Acepta: string (p.ej. 'section'), función/componente, o módulo con .default
   if (typeof As === 'string' || typeof As === 'function') return As;
-  if (As && typeof As ===_ === 'object' && typeof As.default === 'function')
-    return As.default;
+  if (As && typeof As === 'object' && typeof As.default === 'function') return As.default;
   return 'section';
 }
 
@@ -22,11 +20,23 @@ function normalizeHeading(tag) {
 }
 
 /**
- * Section — Contenedor de sección Nivel Senior.
+ * Section — contenedor accesible, SSR-safe y ultra-responsivo.
  *
  * Props:
- * - bg?: 'base' | 'alt' | 'transparent'  (default: 'transparent')
- * ... (resto de props)
+ * - id?: string
+ * - as?: keyof JSX.IntrinsicElements | React.ComponentType  (default: 'section')
+ * - title?: React.ReactNode
+ * - subtitle?: React.ReactNode
+ * - eyebrow?: React.ReactNode
+ * - align?: 'center' | 'left'                         (default: 'center')
+ * - pad?: 'sm' | 'md' | 'lg'                          (default: 'lg')            → padding vertical
+ * - heading?: 'h1' | 'h2' | 'h3'                      (default: 'h2')
+ * - container?: 'tight' | 'custom' | 'full'           (default: 'tight')
+ * - contentGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg'   (default: 'md')            → espacio entre header y children
+ * - headerAction?: React.ReactNode
+ * - onInView?: (entry: IntersectionObserverEntry) => void
+ * - anchor? (DEPRECATED) → absorbida, no se reenvía al DOM
+ * - className?, containerClassName?, headerClassName?
  */
 const Section = memo(
   forwardRef(function Section(
@@ -43,9 +53,7 @@ const Section = memo(
       contentGap = 'md',
       headerAction,
       onInView,
-      // ✨ ¡NUEVA PROP! Define el color de fondo
-      bg = 'transparent', // Default a transparente para no romper layouts
-      // 👇 DEPRECATED
+      // 👇 DEPRECATED: la capturamos para que NO se filtre al DOM
       anchor, // eslint-disable-line no-unused-vars
       className = '',
       containerClassName = '',
@@ -90,16 +98,14 @@ const Section = memo(
 
     // Padding vertical
     const padY =
-      pad === 'sm'
-        ? 'py-12 md:py-14'
-        : pad === 'md'
-        ? 'py-16 md:py-20'
-        : 'py-20 md:py-24';
+      pad === 'sm' ? 'py-12 md:py-14'
+      : pad === 'md' ? 'py-16 md:py-20'
+      : 'py-20 md:py-24';
 
     // Alineación
     const alignText = align === 'left' ? 'text-left' : 'text-center';
 
-    // Contenedor
+    // Contenedor (con fallbacks por si no tienes utilidades personalizadas)
     const containerMap = {
       tight: 'container-tight mx-auto max-w-5xl px-4 md:px-6',
       custom: 'container-custom',
@@ -117,24 +123,15 @@ const Section = memo(
     };
     const gapCls = gapMap[contentGap] || gapMap.md;
 
-    // ✨ ¡MAPA DE FONDOS!
-    // Mapea la prop 'bg' a las clases de 'tailwind.config.mjs'
-    const bgMap = {
-      base: 'bg-background', // Tu fondo 'crema'
-      alt: 'bg-background-alt', // Tu fondo 'rosa claro'
-      transparent: 'bg-transparent',
-    };
-
     return (
       <As
         id={id}
         ref={setRefs}
-        className={cn(
+        className={[
           padY,
-          bgMap[bg], // <-- ¡AQUÍ SE APLICA EL FONDO!
-          'scroll-mt-[var(--header-height,72px)]', // <-- ¡CORREGIDO!
-          className
-        )}
+          'scroll-mt-[var(--nav-h,72px)]', // offset con alto real del header fijo
+          className,
+        ].join(' ')}
         aria-labelledby={title ? headingId : undefined}
         aria-describedby={subtitle ? subtitleId : undefined}
         data-section={id || undefined}
@@ -145,34 +142,34 @@ const Section = memo(
         }}
         {...rest}
       >
-        <div className={cn(containerCls, containerClassName)}>
+        <div className={[containerCls, containerClassName].join(' ')}>
           {(title || subtitle || eyebrow || headerAction) && (
             <div
-              className={cn(
+              className={[
                 'mx-auto max-w-2xl',
                 alignText,
                 headerAction && align === 'left' ? 'md:max-w-none' : '',
-                headerClassName
-              )}
+                headerClassName,
+              ].join(' ')}
             >
               <div
-                className={cn(
+                className={[
                   headerAction && align === 'left'
                     ? 'md:flex md:items-end md:justify-between md:gap-6'
-                    : ''
-                )}
+                    : '',
+                ].join(' ')}
               >
                 <div className="min-w-0">
                   {eyebrow && (
                     <motion.p
                       {...fadeUp}
                       transition={reduceMotion ? { duration: 0 } : undefined}
-                      className={cn(
-                        // --- ¡CIRUGÍA DE ESTILO! ---
+                      className={[
                         'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium tracking-wide',
-                        'border-[--color-primary-border] bg-[--color-primary-bg]/20 text-[--color-primary]',
-                        'mb-2'
-                      )}
+                        'border-slate-200 bg-slate-50 text-slate-600',
+                        'dark:border-white/10 dark:bg-white/5 dark:text-slate-200',
+                        'mb-2',
+                      ].join(' ')}
                     >
                       {eyebrow}
                     </motion.p>
@@ -182,19 +179,14 @@ const Section = memo(
                     <motion.div
                       {...fadeUp}
                       transition={reduceMotion ? { duration: 0 } : undefined}
-                      className={
-                        align === 'left' ? '' : 'flex items-start justify-center'
-                      }
+                      className={align === 'left' ? '' : 'flex items-start justify-center'}
                     >
                       <HeadingTag
                         id={headingId}
-                        className={cn(
-                          // --- ¡CIRUGÍA DE ESTILO! ---
-                          'relative text-3xl sm:text-4xl font-bold tracking-tight leading-[1.25]',
-                          'text-[--color-foreground]'
-                        )}
+                        className="relative text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-[1.25]"
                       >
                         <span>{title}</span>
+                        {/* Link de ancla removido intencionalmente */}
                       </HeadingTag>
                     </motion.div>
                   )}
@@ -204,12 +196,10 @@ const Section = memo(
                       id={subtitleId}
                       {...fadeUp}
                       transition={reduceMotion ? { duration: 0 } : undefined}
-                      className={cn(
-                        // --- ¡CIRUGÍA DE ESTILO! ---
-                        'mt-2 leading-relaxed',
-                        'text-[--color-foreground-muted]',
-                        align === 'left' ? '' : 'mx-auto'
-                      )}
+                      className={[
+                        'mt-2 text-slate-600 dark:text-slate-300 leading-relaxed',
+                        align === 'left' ? '' : 'mx-auto',
+                      ].join(' ')}
                     >
                       {subtitle}
                     </motion.p>
@@ -217,11 +207,7 @@ const Section = memo(
                 </div>
 
                 {headerAction && (
-                  <div
-                    className={
-                      align === 'left' ? 'mt-4 md:mt-0 shrink-0' : 'mt-6'
-                    }
-                  >
+                  <div className={align === 'left' ? 'mt-4 md:mt-0 shrink-0' : 'mt-6'}>
                     {headerAction}
                   </div>
                 )}

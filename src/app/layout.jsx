@@ -1,125 +1,131 @@
-/* --- FILE: src/app/layout.jsx (NÍTIDO Y LISTO PARA PRODUCCIÓN) --- */
-/**
- * @file layout.jsx
- * @description Layout raíz para "El Jardín de la Abuela".
- * @description Arreglado: Se quitó ErrorBoundary, script dark, y props innecesarias.
- */
-
-// Importaciones necesarias
-import React from 'react';
+// --- FILE: src/app/layout.js ---
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/shared/Footer';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import './globals.css';
 import Script from 'next/script';
 import { Inter } from 'next/font/google';
-import { cn } from '@/lib/utils'; // <-- ¡Ahora sí existe!
-import Navbar from '@/components/shared/Navbar';
-import Footer from '@/components/shared/Footer';
-import { BRAND_NAME, BRAND_TAGLINE } from '@/lib/constants';
-import './globals.css'; // <-- ¡LA MAGIA!
 
-// --- Configuración de Fuente ---
-const mainFont = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans', // Define la variable CSS para Tailwind
-  display: 'swap',
-});
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-// --- Metadatos SEO (Tu SEO estaba perfecto) ---
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://eljardindelaabuela.vercel.app';
 export const metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: `${BRAND_NAME} - ${BRAND_TAGLINE}`,
-    template: `%s | ${BRAND_NAME}`,
-  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: { default: 'AJM Digital Solutions', template: '%s | AJM Digital Solutions' },
   description:
-    'Descubre jabones artesanales hechos a mano en San Pedro Sula con ingredientes naturales y amor familiar. Cuida tu piel con El Jardín de la Abuela. Haz tu pedido por WhatsApp.',
+    'Desarrollo web y apps para negocios: sitios corporativos, landing pages y e-commerce. Diseño sobrio, rendimiento alto y plazos serios.',
   openGraph: {
     type: 'website',
     url: '/',
-    siteName: BRAND_NAME,
-    title: `${BRAND_NAME} - ${BRAND_TAGLINE}`,
-    description:
-      'Jabones naturales, elaborados artesanalmente con cariño familiar en Honduras.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
-    locale: 'es_HN',
+    siteName: 'AJM Digital Solutions',
+    title: 'AJM Digital Solutions',
+    description: 'Sitios rápidos, claros y listos para vender. Trato directo con el desarrollador.',
+    images: [{ url: '/opengraph-image.png', width: 1200, height: 630 }],
+    locale: 'es_ES',
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${BRAND_NAME} - ${BRAND_TAGLINE}`,
-    description:
-      'Jabones artesanales hechos con ingredientes puros y recetas familiares.',
-    images: ['/og-image.png'],
+    title: 'AJM Digital Solutions',
+    description: 'Desarrollo web que convierte, sin vueltas.',
+    images: ['/opengraph-image.png'],
   },
   alternates: {
     canonical: '/',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
-// --- Schema.org Básico (Tu Schema estaba perfecto) ---
-const orgSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: BRAND_NAME,
-  url: siteUrl,
-  logo: `${siteUrl}/logo.png`,
-  description: BRAND_TAGLINE,
-};
+// ✅ Nav consistente con tus secciones actuales
+const NAV = [
+  { href: "#hero",       label: "Inicio" },
+  { href: "/servicios",  label: "Servicios" }, // ← ya NO es #servicios
+  { href: "#planes",     label: "Planes" },    // asegúrate que tu sección tenga id="planes"
+  //{ href: "#proyectos",  label: "Portafolio" },// id="proyectos" en tu ProjectsSection
+  { href: "#proceso",    label: "Proceso" },
+  { href: "#faqs",       label: "FAQ" },
+  { href: "#contacto",   label: "Contacto" },
+];
 
-/**
- * Componente `RootLayout`.
- * @param {object} props
- * @param {React.ReactNode} props.children - Contenido de la página (page.jsx)
- * @returns {JSX.Element}
- */
+
+// ✅ CTA WhatsApp
+const RAW_PHONE = (process.env.NEXT_PUBLIC_WA_NUMBER || '').replace(/\D/g, '');
+const WA_MSG =
+  process.env.NEXT_PUBLIC_WA_MESSAGE ||
+  'Hola AJM, quiero cotizar mi proyecto web.';
+const waHref = RAW_PHONE
+  ? `https://wa.me/${RAW_PHONE}?text=${encodeURIComponent(WA_MSG)}`
+  : undefined;
+
 export default function RootLayout({ children }) {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const tel = RAW_PHONE ? `+${RAW_PHONE}` : undefined;
+
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'AJM Digital Solutions',
+    url: base,
+    logo: `${base}/opengraph-image.png`,
+    areaServed: 'Global',
+    sameAs: [],
+    contactPoint: tel
+      ? [{ '@type': 'ContactPoint', contactType: 'customer support', telephone: tel, availableLanguage: ['es', 'en'] }]
+      : undefined,
+  };
+
   return (
-    <html
-      lang="es"
-      className={`${mainFont.variable} scroll-pt-[var(--header-height,72px)] scroll-smooth`}
-      // ¡Quitamos suppressHydrationWarning porque ya no hay script de tema!
-    >
+    <html lang="es" className="scroll-pt-24" suppressHydrationWarning>
       <head>
-        {/* --- ¡ARREGLADO! ---
-            Quitamos el script de 'theme-and-lang-init' (dark mode).
-            Era basura innecesaria.
-        */}
+        {/* Anti-FOUC: tema y lang antes de hidratar */}
+        <Script
+          id="theme-and-lang-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+  try{
+    var d = document.documentElement;
+    // 1) Idioma: storage > navegador > 'es'
+    var LSK='locale';
+    var loc = localStorage.getItem(LSK);
+    if(!loc){
+      var nav = navigator;
+      var cand = (nav.language || (nav.languages && nav.languages[0]) || 'es') + '';
+      loc = cand.slice(0,2).toLowerCase();
+      if(loc!=='es' && loc!=='en') loc='es';
+    } else {
+      loc = (loc+'').slice(0,2).toLowerCase();
+    }
+    d.setAttribute('lang', loc);
+    d.dataset.locale = loc;
+
+    // 2) Tema: storage > prefers-color-scheme
+    var themeLSK = 'theme';
+    var saved = localStorage.getItem(themeLSK);
+    var wantDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (wantDark) d.classList.add('dark'); else d.classList.remove('dark');
+  }catch(e){}
+})();`,
+          }}
+        />
       </head>
-      {/*
-        ¡AQUÍ ESTÁ LA SOLUCIÓN AL FONDO BLANCO!
-        'bg-background' y 'text-foreground' ahora SÍ funcionan
-        porque globals.css está importado.
-      */}
-      <body
-        className={cn(
-          'font-sans antialiased bg-background text-foreground',
-          'min-h-screen flex flex-col'
-        )}
-      >
-        {/* --- ¡ARREGLADO! ---
-            Quitamos el <ErrorBoundary> que no existe.
-        */}
+      <body className={`${inter.variable} font-sans antialiased bg-[var(--background)] text-[var(--foreground)]`}>
 
-        {/* El 'Skip link' del Navbar es suficiente, quitamos el de aquí. */}
+        <ErrorBoundary>
+          <a
+            href="#contenido"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:bg-white focus:px-3 focus:py-2 focus:rounded"
+          >
+            Saltar al contenido
+          </a>
 
-        {/* --- ¡ARREGLADO! ---
-            Llamamos al Navbar sin props, porque él solito
-            importa lo que necesita de 'constants.js'.
-        */}
-        <Navbar />
+          <div className="min-h-screen">
+            {/* ⬇️ Usa el nuevo Navbar (elimina <Header />) */}
+            <Navbar nav={NAV} waHref={waHref} />
 
-        {/* Contenido principal de la página (viene de page.jsx) */}
-        <main id="main-content" className="flex-grow">
-          {children}
-        </main>
+            <main id="contenido">{children}</main>
+            <Footer />
+          </div>
+        </ErrorBoundary>
 
-        {/* Renderiza Footer */}
-        <Footer />
-
-        {/* Script JSON-LD para Schema.org (Esto estaba perfecto) */}
         <Script
           id="org-schema"
           type="application/ld+json"
@@ -130,4 +136,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-// --- END FILE ---
