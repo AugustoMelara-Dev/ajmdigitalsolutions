@@ -1,63 +1,82 @@
-"use client";
+/* --- FILE: src/components/ui/Button.jsx (v3 - ARREGLO DEFINITIVO) --- */
+/**
+ * @file Button.jsx
+ * @description Componente de botón reutilizable, adaptado al tema.
+ * @description AÑADIDO 'no-underline' para ganar la guerra de especificidad
+ * contra los estilos globales de <a>.
+ */
+'use client';
 
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 
-// --- FIX: Define the 'cn' utility function ---
-const cn = (...xs) => xs.filter(Boolean).join(" ");
+// --- Utilidad 'cn' local ---
+const cn = (...xs) => xs.filter(Boolean).join(' ');
 
+// --- ESTILOS BASE (ADAPTADOS) ---
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold rounded-2xl " +
-  "transition-[background,opacity,transform] duration-200 " +
-  "focus:outline-none focus:ring-2 focus:ring-[var(--ajm-accent)] focus:ring-offset-2 " +
-  "disabled:opacity-50 disabled:pointer-events-none min-h-[44px]";
+  'inline-flex items-center justify-center gap-2 font-semibold rounded-2xl ' +
+  'transition-[background,opacity,transform] duration-200 ' +
+  'focus:outline-none focus:ring-2 focus:ring-[var(--color-ring)] focus:ring-offset-2 focus:ring-offset-[var(--color-background)] ' +
+  'disabled:opacity-50 disabled:pointer-events-none min-h-[44px] ' +
+  // --- ¡AQUÍ ESTÁ EL ARREGLO, MADRE MÍA! ---
+  'no-underline hover:no-underline'; // Gana la guerra contra a:hover
 
+// --- TAMAÑOS ---
 const sizes = {
-  sm: "h-9 px-3 text-[clamp(.85rem,2.2vw,.95rem)]",
-  md: "h-11 px-4 text-[clamp(.9rem,2.4vw,1rem)]",
-  lg: "h-12 px-5 text-[clamp(1rem,2.6vw,1.125rem)]",
+  sm: 'h-9 px-3 text-[clamp(.85rem,2.2vw,.95rem)]',
+  md: 'h-11 px-4 text-[clamp(.9rem,2.4vw,1rem)]',
+  lg: 'h-12 px-5 text-[clamp(1rem,2.6vw,1.125rem)]',
 };
 
+// --- VARIANTES (Estas ya estaban bien) ---
 const variants = {
-  /** Botón principal en fondos claros */
+  /** Botón principal (Lavender Pink) */
   primary:
-    "bg-brand text-white hover:opacity-90 active:opacity-95 " +
-    "shadow-lg shadow-ajm-accent/20",
-  /** Acción alternativa en fondos claros */
+    'bg-[--color-primary] text-[--color-primary-fg] hover:opacity-90 active:opacity-95 ' +
+    'shadow-lg shadow-[--color-primary]/20',
+
+  /** Alternativa (ej. fondo crema claro, texto oscuro) */
   secondary:
-    "bg-slate-100 text-slate-900 hover:bg-slate-200 active:bg-slate-300 " +
-    "border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700",
-  /** Para fondos oscuros (tu “botón blanco”) */
+    'bg-[--color-background-alt] text-[--color-foreground] hover:bg-[--color-background-hover] active:bg-[--color-border] ' +
+    'border border-[--color-border]',
+
+  /** Botón "blanco" sobre fondos de color */
   contrast:
-    "bg-white text-[#0A192F] hover:bg-[#EFF3F8] active:bg-[#E7EDF5] " +
-    "shadow-lg shadow-ajm-accent/20",
-  /** Neutro dentro de cards/listas */
+    'bg-[--color-background] text-[--color-foreground] hover:bg-[--color-background-hover] active:bg-[--color-background-alt] ' +
+    'shadow-lg shadow-black/10',
+
+  /** Borde simple, sin fondo (NEUTRO/GRIS) */
   outline:
-    "bg-transparent border border-slate-300 text-slate-900 hover:bg-slate-50 " +
-    "dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800/50",
-  /** Acción de muy bajo peso visual */
+    'bg-transparent border border-[--color-border] text-[--color-foreground-muted] hover:bg-[--color-background-hover]',
+
+  /** Borde simple, sin fondo (PRIMARIO/ROSA) */
+  'outline-primary':
+    'bg-transparent border border-[--color-primary] text-[--color-primary] hover:bg-[--color-primary-bg]/20',
+
+  /** Solo texto, sin borde (ej. para "cancelar") */
   ghost:
-    "bg-transparent text-brand hover:bg-brand/10 active:bg-brand/15 " +
-    "dark:text-brand",
-  /** Peligro/destruir */
-  destructive: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
-  /** Link con subrayado animado */
-  link:
-    "relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] " +
-    "after:bg-current after:transition-all after:duration-200 hover:after:w-full " +
-    "bg-transparent text-brand px-0",
+    'bg-transparent text-[--color-primary] hover:bg-[--color-primary-bg]/20 active:bg-[--color-primary-bg]/30',
+
+  /** Peligro/destruir (usa variable semántica) */
+  destructive:
+    'bg-[--color-destructive] text-[--color-destructive-fg] hover:opacity-90 active:opacity-95',
+
+  /** Link simple (SIN LÍNEA) */
+  link: 'bg-transparent text-[--color-primary] px-0 hover:opacity-80',
 };
 
+// --- COMPONENTE ---
 export function Button({
-  as = "button",
+  as = 'button',
   href,
-  variant = "primary",
-  size = "md",
+  variant = 'primary',
+  size = 'md',
   leadingIcon: LeadingIcon,
   trailingIcon: TrailingIcon,
   className,
   children,
-  "aria-label": ariaLabel,
+  'aria-label': ariaLabel,
   ...props
 }) {
   const Comp = href ? Link : as;
@@ -70,9 +89,14 @@ export function Button({
       aria-label={ariaLabel}
       {...props}
     >
-      {LeadingIcon ? <LeadingIcon aria-hidden="true" className="-ml-0.5" /> : null}
+      {LeadingIcon ? (
+        <LeadingIcon aria-hidden="true" className="-ml-0.5" />
+      ) : null}
       <span className="whitespace-nowrap">{children}</span>
-      {TrailingIcon ? <TrailingIcon aria-hidden="true" className="-mr-0.5" /> : null}
+      {TrailingIcon ? (
+        <TrailingIcon aria-hidden="true" className="-mr-0.5" />
+      ) : null}
     </Comp>
   );
 }
+// --- END FILE ---

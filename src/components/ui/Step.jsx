@@ -1,181 +1,251 @@
-// --- FILE: src/components/ui/Step.jsx ---
+/* --- FILE: src/components/ui/Section.jsx --- */
+/**
+ * @file Section.jsx
+ * @description Contenedor de sección accesible, responsivo y adaptado al tema.
+ * @description Adaptado para "El Jardín de la Abuela": colores tematizados,
+ * sin modo oscuro y con corrección de anclaje para --header-height.
+ */
 'use client';
 
-import React, { memo, forwardRef, useId } from 'react';
+import React, { forwardRef, memo, useEffect, useId, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useFadeUp } from '@/hooks/useFadeUp';
-import { Check, CircleDot } from 'lucide-react';
+// Asumiendo que cn existe en utils
+import { cn } from '@/lib/utils';
+
+/* =========================
+   Helpers robustos
+   ========================= */
+function normalizeAs(As) {
+  if (typeof As === 'string' || typeof As === 'function') return As;
+  if (As && typeof As === 'object' && typeof As.default === 'function')
+    return As.default;
+  return 'section';
+}
+
+function normalizeHeading(tag) {
+  return tag === 'h1' || tag === 'h2' || tag === 'h3' ? tag : 'h2';
+}
 
 /**
- * Step — tarjeta de paso clara y accesible.
+ * Section — contenedor accesible, SSR-safe y ultra-responsivo.
  *
  * Props:
- *  - as?: 'div' | 'li' | 'article' ... (default: 'div')
- *  - n?: string | number            → número/etiqueta del paso (si no hay icon)
- *  - icon?: React.ComponentType     → ícono opcional (lucide-react u otro)
- *  - title: React.ReactNode
- *  - desc?: React.ReactNode         → si se provee children, tiene prioridad
- *  - children?: React.ReactNode     → contenido libre debajo del título
- *  - status?: 'default' | 'active' | 'done'  (default: 'default')
- *  - size?: 'md' | 'lg'             (default: 'md')
- *  - href?: string                  → si se pasa, renderiza como <a>
- *  - target?: string                → opcional para el link
- *  - rel?: string                   → opcional para el link
- *  - interactive?: boolean          → hover/transform (auto true si hay href)
- *  - role?: string                  → por defecto 'listitem' si as !== 'li'
- *  - className?: string
- *  - onClick?: () => void
- *  - data-analytics?: string        → atributo para tracking
+ * - id?: string
+ * - as?: keyof JSX.IntrinsicElements | React.ComponentType  (default: 'section')
+ * - title?: React.ReactNode
+ * - subtitle?: React.ReactNode
+ * - eyebrow?: React.ReactNode
+ * - align?: 'center' | 'left'                          (default: 'center')
+ * - pad?: 'sm' | 'md' | 'lg'                           (default: 'lg')
+ * - heading?: 'h1' | 'h2' | 'h3'                       (default: 'h2')
+ * - container?: 'tight' | 'custom' | 'full'            (default: 'tight')
+ * - contentGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg'   (default: 'md')
+ * - headerAction?: React.ReactNode
+ * - onInView?: (entry: IntersectionObserverEntry) => void
+ * - className?, containerClassName?, headerClassName?
  */
-const Step = memo(
-  forwardRef(function Step(
+const Section = memo(
+  forwardRef(function Section(
     {
-      as: As = 'div',
-      n,
-      icon: Icon,
+      id,
+      as: asProp = 'section',
       title,
-      desc,
-      children,
-      status = 'default',
-      size = 'md',
-      href,
-      target,
-      rel,
-      interactive,
-      role,
+      subtitle,
+      eyebrow,
+      align = 'center',
+      pad = 'lg',
+      heading = 'h2',
+      container = 'tight',
+      contentGap = 'md',
+      headerAction,
+      onInView,
+      // 👇 DEPRECATED: capturamos para que NO se filtre al DOM
+      anchor, // eslint-disable-line no-unused-vars
       className = '',
-      onClick,
+      containerClassName = '',
+      headerClassName = '',
+      children,
+      style,
       ...rest
     },
     ref
   ) {
-    const reduce = useReducedMotion();
-    const fade = useFadeUp();
+    const reduceMotion = useReducedMotion();
+    const fadeUp = useFadeUp() || {};
     const headingId = useId();
-    const descId = useId();
+    const subtitleId = useId();
+    const rootRef = useRef(null);
 
-    const isLink = typeof href === 'string' && href.length > 0;
-    const isInteractive = interactive ?? isLink ?? !!onClick;
+    const As = normalizeAs(asProp);
+    const HeadingTag = normalizeHeading(heading);
 
-    // Colores según estado
-    const pillBase =
-      'grid place-items-center rounded-full font-semibold border shrink-0';
-    const pillSize = size === 'lg' ? 'w-12 h-12 text-base' : 'w-10 h-10 text-sm';
-
-    const statusMap = {
-      default: {
-        pill: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
-        title: 'text-slate-900 dark:text-slate-100',
-        ring: 'focus-visible:ring-brand/40',
-      },
-      active: {
-        pill: 'bg-brand/10 text-brand border-brand/30',
-        title: 'text-slate-900 dark:text-slate-100',
-        ring: 'focus-visible:ring-brand/50',
-      },
-      done: {
-        pill: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-900/40',
-        title: 'text-slate-900 dark:text-slate-100',
-        ring: 'focus-visible:ring-emerald-400/40',
-      },
+    // Unir ref externa + interna
+    const setRefs = (node) => {
+      rootRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
     };
 
-    const tone = statusMap[status] || statusMap.default;
+    // Observer para analítica (SSR-safe)
+    useEffect(() => {
+      if (!onInView || !rootRef.current || typeof window === 'undefined') return;
+      if (typeof IntersectionObserver === 'undefined') return;
 
-    const cardBase = [
-      'rounded-2xl border p-6',
-      'bg-white border-slate-200 shadow-card',
-      'dark:bg-slate-900 dark:border-slate-800',
-      isInteractive
-        ? 'transition will-change-transform hover:shadow-lg motion-safe:hover:-translate-y-0.5'
-        : '',
-      'focus:outline-none focus-visible:ring-2',
-      tone.ring,
-      size === 'lg' ? 'md:p-7' : '',
-      className,
-    ].join(' ');
-
-    const HeadTag = 'div'; // dentro de la tarjeta, no forzamos <hN> para no romper jerarquías
-
-    const content = (
-      <motion.div
-        {...fade}
-        transition={reduce ? { duration: 0 } : undefined}
-        ref={ref}
-        className={cardBase}
-        aria-labelledby={headingId}
-        aria-describedby={desc || children ? descId : undefined}
-        {...rest}
-      >
-        <div className="flex items-start gap-4">
-          {/* Píldora con número o ícono */}
-          <span className={[pillBase, pillSize, tone.pill].join(' ')} aria-hidden="true">
-            {status === 'done' ? (
-              <Check size={size === 'lg' ? 18 : 16} />
-            ) : Icon ? (
-              <Icon size={size === 'lg' ? 18 : 16} />
-            ) : typeof n !== 'undefined' ? (
-              n
-            ) : (
-              <CircleDot size={size === 'lg' ? 18 : 16} />
-            )}
-          </span>
-
-          <div className="min-w-0">
-            <HeadTag
-              id={headingId}
-              className={['font-semibold leading-snug', tone.title, size === 'lg' ? 'text-lg' : ''].join(' ')}
-            >
-              {title}
-            </HeadTag>
-
-            {children ? (
-              <div id={descId} className="mt-2 text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
-                {children}
-              </div>
-            ) : desc ? (
-              <p id={descId} className="mt-2 text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
-                {desc}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      </motion.div>
-    );
-
-    const commonLinkProps = isLink
-      ? {
-          href,
-          target,
-          rel:
-            rel ??
-            (href?.startsWith('http')
-              ? 'noopener noreferrer'
-              : undefined),
-          role: role || (As !== 'li' ? 'listitem' : undefined),
-        }
-      : {
-          role: role || (As !== 'li' ? 'listitem' : undefined),
-          onClick,
-          tabIndex: 0,
-        };
-
-    // Render como <a> si hay href, o como el elemento indicado en `as`
-    if (isLink) {
-      return (
-        <As {...commonLinkProps} className="block group">
-          {content}
-        </As>
+      const obs = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) if (e.isIntersecting) onInView(e);
+        },
+        { threshold: 0.3, rootMargin: '0px 0px -10% 0px' }
       );
-    }
+
+      obs.observe(rootRef.current);
+      return () => obs.disconnect();
+    }, [onInView]);
+
+    // Padding vertical
+    const padY =
+      pad === 'sm'
+        ? 'py-12 md:py-14'
+        : pad === 'md'
+        ? 'py-16 md:py-20'
+        : 'py-20 md:py-24';
+
+    // Alineación
+    const alignText = align === 'left' ? 'text-left' : 'text-center';
+
+    // Contenedor (con fallbacks por si no tienes utilidades personalizadas)
+    const containerMap = {
+      tight: 'container-tight mx-auto max-w-5xl px-4 md:px-6',
+      custom: 'container-custom',
+      full: 'w-full max-w-none px-4 md:px-6',
+    };
+    const containerCls = containerMap[container] || containerMap.tight;
+
+    // Gap entre header y contenido
+    const gapMap = {
+      none: 'mt-0',
+      xs: 'mt-4 md:mt-5',
+      sm: 'mt-6 md:mt-8',
+      md: 'mt-8 md:mt-10',
+      lg: 'mt-10 md:mt-12',
+    };
+    const gapCls = gapMap[contentGap] || gapMap.md;
 
     return (
-      <As {...commonLinkProps}>
-        {content}
+      <As
+        id={id}
+        ref={setRefs}
+        className={cn(
+          padY,
+          // *** CORRECCIÓN DE BUG ***
+          // Usa --header-height (de Navbar.jsx) en lugar de --nav-h
+          'scroll-mt-[var(--header-height,72px)]',
+          className
+        )}
+        aria-labelledby={title ? headingId : undefined}
+        aria-describedby={subtitle ? subtitleId : undefined}
+        data-section={id || undefined}
+        style={{
+          contentVisibility: 'auto',
+          containIntrinsicSize: '0 800px',
+          ...style,
+        }}
+        {...rest}
+      >
+        <div className={cn(containerCls, containerClassName)}>
+          {(title || subtitle || eyebrow || headerAction) && (
+            <div
+              className={cn(
+                'mx-auto max-w-2xl',
+                alignText,
+                headerAction && align === 'left' ? 'md:max-w-none' : '',
+                headerClassName
+              )}
+            >
+              <div
+                className={cn(
+                  headerAction && align === 'left'
+                    ? 'md:flex md:items-end md:justify-between md:gap-6'
+                    : ''
+                )}
+              >
+                <div className="min-w-0">
+                  {eyebrow && (
+                    <motion.p
+                      {...fadeUp}
+                      transition={reduceMotion ? { duration: 0 } : undefined}
+                      className={cn(
+                        'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium tracking-wide',
+                        // --- ADAPTACIÓN DE TEMA ---
+                        // Estilo de "badge" primario usando variables CSS
+                        'border-[--color-primary-border] bg-[--color-primary-bg]/20 text-[--color-primary]',
+                        'mb-2'
+                      )}
+                    >
+                      {eyebrow}
+                    </motion.p>
+                  )}
+
+                  {title && (
+                    <motion.div
+                      {...fadeUp}
+                      transition={reduceMotion ? { duration: 0 } : undefined}
+                      className={
+                        align === 'left' ? '' : 'flex items-start justify-center'
+                      }
+                    >
+                      <HeadingTag
+                        id={headingId}
+                        className={cn(
+                          'relative text-3xl sm:text-4xl font-bold tracking-tight leading-[1.25]',
+                          // --- ADAPTACIÓN DE TEMA ---
+                          'text-[--color-foreground]'
+                        )}
+                      >
+                        <span>{title}</span>
+                      </HeadingTag>
+                    </motion.div>
+                  )}
+
+                  {subtitle && (
+                    <motion.p
+                      id={subtitleId}
+                      {...fadeUp}
+                      transition={reduceMotion ? { duration: 0 } : undefined}
+                      className={cn(
+                        'mt-2 leading-relaxed',
+                        // --- ADAPTACIÓN DE TEMA ---
+                        'text-[--color-foreground-muted]',
+                        align === 'left' ? '' : 'mx-auto'
+                      )}
+                    >
+                      {subtitle}
+                    </motion.p>
+                  )}
+                </div>
+
+                {headerAction && (
+                  <div
+                    className={
+                      align === 'left' ? 'mt-4 md:mt-0 shrink-0' : 'mt-6'
+                    }
+                  >
+                    {headerAction}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Contenido de la sección */}
+          <div className={gapCls}>{children}</div>
+        </div>
       </As>
     );
   })
 );
 
-export { Step };
-export default Step;
+export { Section };
+export default Section;
+// --- END FILE ---

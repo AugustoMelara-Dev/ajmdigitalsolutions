@@ -1,58 +1,40 @@
+/* --- FILE: src/app/page.jsx (¡VERSIÓN FINAL COMPLETA!) --- */
+/**
+ * @file page.jsx
+ * @description Componente principal de la landing page "El Jardín de la Abuela".
+ * @description Ensambla todas las secciones en el orden final.
+ */
+
 'use client';
 
-import dynamic from 'next/dynamic';
+import React from 'react';
+
+// --- Hooks ---
 import { useSmoothAnchorScroll } from '@/hooks/useSmoothAnchorScroll';
 
+// --- Secciones de la Página (¡TODAS LAS PIEZAS!) ---
 import HeroSection from '@/components/sections/HeroSection';
-import ServicesSection from '@/components/sections/ServicesSection';
-import WhyUsSection from '@/components/sections/WhyUsSection';
-import ProcessSection from '@/components/sections/ProcessSection';
+import AboutSection from '@/components/sections/AboutSection'; // <-- ¡AÑADIDO!
+import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
+import CtaSection from '@/components/sections/CtaSection';
 
-// Cargas diferidas
-const ProjectsSection = dynamic(() => import('@/components/sections/ProjectsSection'), {
-  loading: () => <SectionSkeleton />,
-});
-const PlansSection = dynamic(() => import('@/components/sections/PlansSection'), {
-  loading: () => <SectionSkeleton />,
-});
-const FaqSection = dynamic(() => import('@/components/sections/FaqSection'), {
-  loading: () => <SectionSkeleton />,
-});
-const CtaFinalSection = dynamic(() => import('@/components/sections/CtaFinalSection'), {
-  loading: () => <SectionSkeleton noHeading />,
-});
-const ContactSection = dynamic(() => import('@/components/sections/ContactSection'), {
-  loading: () => <SectionSkeleton />,
-});
+/**
+ * Componente `HomePage`.
+ * Renderiza la secuencia final de secciones para "El Jardín de la Abuela".
+ * @returns {JSX.Element}
+ */
+export default function HomePage() {
+  // Activa el scroll suave para todos los enlaces de ancla (#...)
+  useSmoothAnchorScroll();
 
-function SectionSkeleton({ noHeading = false }) {
   return (
-    <section className="py-16">
-      <div className="w-[92%] max-w-[1200px] mx-auto animate-pulse">
-        {!noHeading && <div className="h-7 w-64 bg-slate-200 rounded mb-3" />}
-        {!noHeading && <div className="h-4 w-3/4 bg-slate-200 rounded mb-8" />}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-40 bg-slate-100 rounded-2xl border border-slate-200" />
-          ))}
-        </div>
-      </div>
-    </section>
+    // <main> es crucial para accesibilidad y SEO
+    <main id="main-content">
+      <HeroSection />
+      <AboutSection /> {/* <-- ¡AÑADIDO EN SU LUGAR! */}
+      <ProductCatalogSection />
+      <CtaSection />
+    </main>
   );
 }
-
-export default function Page() {
-  useSmoothAnchorScroll(); // respeta el offset global
-
-  return (
-  <>
-    <HeroSection />
-    <PlansSection />      
-    {/* <ProjectsSection /> */} 
-    <ProcessSection />   
-    <WhyUsSection />      
-    <FaqSection />        
-    <ContactSection />    
-  </>
-);
-}
+// --- END FILE ---
