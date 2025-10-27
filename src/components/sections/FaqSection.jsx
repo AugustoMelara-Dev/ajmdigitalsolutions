@@ -181,8 +181,8 @@ export default function FaqSection({ items }) {
 
   return (
     <Section
-      id="faq"
-      headerAction={<span id="faqs" className="sr-only" aria-hidden="true" />}
+      id="faqs"
+      //headerAction={<span id="faqs" className="sr-only" aria-hidden="true" />}
       title="Preguntas frecuentes"
       subtitle="Resolvemos las dudas más comunes para que avances con certeza."
       className={cn("relative bg-[var(--ajm-bg)]", entrance)}

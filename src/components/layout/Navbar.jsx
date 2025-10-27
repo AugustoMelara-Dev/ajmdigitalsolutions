@@ -11,9 +11,9 @@ import { usePathname } from "next/navigation";
 const DEFAULT_NAV = [
   { href: "#hero",       label: "Inicio" },
   { href: "/servicios",  label: "Servicios" },
-  { href: "#proceso",    label: "Proceso" },
   { href: "#planes",     label: "Planes" },
-  { href: "#portafolio", label: "Portafolio" },
+  { href: "#proceso",    label: "Proceso" },
+  //{ href: "#portafolio", label: "Portafolio" },
   { href: "#faqs",       label: "FAQ" },
   { href: "#contacto",   label: "Contacto" },
 ];
@@ -131,7 +131,8 @@ function useScrollSpyByPosition(ids, { offset = 0, override = "" } = {}) {
         if (override) { setActive(override); return; }
         if (!positions.length) return;
         const y = (window.scrollY || 0) + 2;
-        const offY = y + offset;
+        // Intenta añadir 150px extra al offset
+        const offY = y + offset + 50;
         let current = positions[0].id;
         for (let i = 0; i < positions.length; i++) {
           if (positions[i].top <= offY) current = positions[i].id;
